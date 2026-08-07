@@ -8,14 +8,52 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role     @default(CITIZEN)
-  phoneNumber String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  role            Role     @default(CITIZEN)
+  phoneNumber     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  name            String
+  acceptedReports Report[] @relation("AcceptedReports")
+  reports         Report[]
+}
+
+model Report {
+  id                String       @id @default(uuid())
+  trackingId        String       @unique
+  title             String
+  animalType        AnimalType
+  description       String
+  phoneNumber       String?
+  latitude          Float
+  longitude         Float
+  imageUrl          String
+  status            ReportStatus @default(PENDING)
+  reporterId        String?
+  acceptedById      String?
+  completedImageUrl String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  acceptedBy        User?        @relation("AcceptedReports", fields: [acceptedById], references: [id])
+  reporter          User?        @relation(fields: [reporterId], references: [id])
+}
+
+enum ReportStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+}
+
+enum AnimalType {
+  DOG
+  CAT
+  BIRD
+  COW
+  MONKEY
+  SNAKE
+  OTHER
 }
 
 enum Role {

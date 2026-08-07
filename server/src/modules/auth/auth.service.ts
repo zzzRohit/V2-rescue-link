@@ -8,6 +8,10 @@ type RegisterUserInput = {
   password: string;
   phoneNumber: string;
 };
+type LoginUserInput = {
+  email: string;
+  password: string;
+};
 
 export const register = async (userData: RegisterUserInput) => {
   // Check if email already exists
@@ -54,7 +58,46 @@ export const register = async (userData: RegisterUserInput) => {
       name: user.name,
       email: user.email,
       phoneNumber: user.phoneNumber,
-      role: user.role,  
+      role: user.role,
     },
   };
 };
+export const login = async (loginData: LoginUserInput) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: loginData.email,
+    },
+  });
+
+  if (!user) {
+    throw new Error("Invalid email or password");
+  }
+
+  const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
+
+  if (!isPasswordValid) {
+    throw new Error("Invalid email or password");
+  }
+
+  const token = jwt.sign(
+    {
+      userId: user.id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+    },
+  };
+}

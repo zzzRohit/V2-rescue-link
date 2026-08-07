@@ -4,7 +4,6 @@ import { env } from "./config/env.js";
 import { prisma } from "./prisma/client.js";
 
 const server = createServer(app);
-
 server.listen(env.PORT, () => {
   console.log(`Server listening on port ${String(env.PORT)}`);
 });
