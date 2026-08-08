@@ -12,3 +12,10 @@ export const createReport = async (req: Request, res: Response) => {
     });
 }
 }
+export const testAuth = async (req: Request, res: Response) => {
+  return res.status(200).json({
+    success: true,
+    message: "Authentication middleware works",
+    user: req.user,
+  });
+};
