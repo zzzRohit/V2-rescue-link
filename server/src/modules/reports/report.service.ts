@@ -10,9 +10,10 @@ type CreateReportInput = {
   latitude: number;
   longitude: number;
   imageUrl: string;
+  reporterId: string | undefined; // Optional reporterId field
 };
 
-export const createReport = async (reportData: CreateReportInput) => {
+export const createReport = async (reportData: CreateReportInput, reporterId: string | undefined) => {
   try {
     const trackingId = generateTrackingId();
 
@@ -26,6 +27,7 @@ export const createReport = async (reportData: CreateReportInput) => {
         latitude: reportData.latitude,
         longitude: reportData.longitude,
         imageUrl: reportData.imageUrl,
+        reporterId: reporterId ?? null,
       },
     });
 
