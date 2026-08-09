@@ -14,8 +14,7 @@ type CreateReportInput = {
 };
 
 export const createReport = async (reportData: CreateReportInput, reporterId: string | undefined) => {
-  try {
-    const trackingId = generateTrackingId();
+  const trackingId = generateTrackingId();
 
     const report = await prisma.report.create({
       data: {
@@ -34,14 +33,15 @@ export const createReport = async (reportData: CreateReportInput, reporterId: st
     return {
       trackingId: report.trackingId,
     };
-  } catch (error) {
-  console.dir(error, { depth: null });
 
-  if (error instanceof Error) {
-    console.error(error.message);
-    console.error(error.stack);
-  }
+};
+export const getMyReports = async (userId: string) => {
+    const reports = await prisma.report.findMany({
+      where: {
+        reporterId: userId,
+      },
+    });
 
-  throw error;
-}
+    return reports;
+  
 };
