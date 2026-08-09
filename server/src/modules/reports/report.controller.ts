@@ -30,3 +30,10 @@ export const getMyReports = async (req: Request, res: Response, next: NextFuncti
       user: req.user,
     });
   };
+  export const testAuthRescue = async (req: Request, res: Response) => {
+    return res.status(200).json({
+      success: true,
+      message: "You are authenticated as rescue",
+      user: req.user,
+    });
+  };

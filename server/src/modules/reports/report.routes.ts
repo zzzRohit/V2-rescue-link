@@ -14,6 +14,12 @@ router.get("/my",
     middleware,
     reportController.getMyReports);
 
-router.get("/admin-test" , middleware, authorize(Role.ADMIN) , reportController.testAuth);
+router.get("/admin-test" , middleware, authorize(Role.ADMIN ) , reportController.testAuth);
+router.get(
+  "/rescue-test",
+  middleware,
+  authorize(Role.ADMIN, Role.RESCUER),
+  reportController.testAuthRescue
+);
 // router.get("/test-auth", middleware, testAuth);
 export default router;
