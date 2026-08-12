@@ -1,17 +1,22 @@
-    import { Request, Response } from "express";
-    import * as userService from "./user.service.js";
+import { Request, Response } from "express";
+import * as userService from "./user.service.js";
+import { AppError } from "../../utils/Apperror.js";
 
-    export const updateLocation = async (req: Request, res: Response , next: Function) => {
-        try{
-            const { longitude, latitude } = req.body;
-        const userId = req.user?.userId;
-        if(!userId) {
-            return res.status(400).json({ message: "User ID is missing in the request" });
-        }
-        const response = await userService.updateLocation(userId, longitude, latitude);
-        return res.status(200).json({ message: "Location updated successfully", data: response });
-        }catch(error){
-            console.error("Controller Error:", error);
-            next(error); // Pass the error to the error handling middleware
-        }
+export const updateLocation = async (req: Request, res: Response, next: Function) => {
+  try {
+    const { longitude, latitude } = req.body ?? {};
+
+    if (longitude === undefined || latitude === undefined) {
+      throw new AppError("Latitude and longitude are required", 400);
     }
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new AppError("User ID is missing in the request", 400);
+    }
+    const response = await userService.updateLocation(userId, longitude, latitude);
+    return res.status(200).json({ message: "Location updated successfully", data: response });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
+};
