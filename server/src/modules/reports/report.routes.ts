@@ -21,5 +21,11 @@ router.get(
   authorize(Role.ADMIN, Role.RESCUER),
   reportController.testAuthRescue
 );
+router.get(
+  "/available",
+  middleware,
+  authorize(Role.RESCUER),
+  reportController.getAvailableReports
+);
 // router.get("/test-auth", middleware, testAuth);
 export default router;

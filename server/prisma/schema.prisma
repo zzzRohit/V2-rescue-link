@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())
-  email           String   @unique
-  password        String
-  role            Role     @default(CITIZEN)
-  phoneNumber     String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  name            String
-  longitude      Float?
-  latitude       Float?
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  role              Role      @default(CITIZEN)
+  phoneNumber       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  name              String
+  longitude         Float?
+  latitude          Float?
+  serviceRadiusKm   Float?
   locationUpdatedAt DateTime?
-  acceptedReports Report[] @relation("AcceptedReports")
-  reports         Report[]
+  acceptedReports   Report[]  @relation("AcceptedReports")
+  reports           Report[]
 }
 
 model Report {

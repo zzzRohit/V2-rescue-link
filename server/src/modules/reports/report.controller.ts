@@ -37,3 +37,17 @@ export const getMyReports = async (req: Request, res: Response, next: NextFuncti
       user: req.user,
     });
   };
+  export const getAvailableReports = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new AppError("User ID is missing in the request", 401);
+
+    }
+    try {
+      const reports = await reportService.getAvailableReports(userId);
+      return res.status(200).json({ message: "Available reports fetched successfully", data: reports });
+    } catch (error) {
+      console.error("Controller Error:", error);
+      next(error); // Pass the error to the error handling middleware
+    }
+  }
