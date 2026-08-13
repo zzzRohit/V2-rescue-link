@@ -96,3 +96,26 @@ export const getAvailableReports = async (userId: string) => {
 
   return availableReports;
 };
+export const acceptReport = async (reportId: string, userId: string) => {
+  const report = await prisma.report.findUnique({
+    where: { id: reportId },
+  });
+
+  if (!report) {
+    throw new AppError("Report not found", 404);
+  }
+
+  if (report.status !== "PENDING") {
+    throw new AppError("Report is not available for acceptance", 400);
+  }
+
+  const updatedReport = await prisma.report.update({
+    where: { id: reportId },
+    data: {
+      status: "ACCEPTED",
+      acceptedById: userId,
+    },
+  });
+
+  return updatedReport;
+};
