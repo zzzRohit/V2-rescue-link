@@ -105,17 +105,23 @@ export const acceptReport = async (reportId: string, userId: string) => {
     throw new AppError("Report not found", 404);
   }
 
-  if (report.status !== "PENDING") {
-    throw new AppError("Report is not available for acceptance", 400);
-  }
+  
 
-  const updatedReport = await prisma.report.update({
-    where: { id: reportId },
+  const updatedReport = await prisma.report.updateMany({
+    where: { id: reportId ,
+      status: "PENDING"
+    },
     data: {
       status: "ACCEPTED",
       acceptedById: userId,
     },
   });
+  if (updatedReport.count === 0) {
+  throw new AppError(
+    "Report is no longer available for acceptance",
+    409,
+  );
+}
 
   return updatedReport;
 };
