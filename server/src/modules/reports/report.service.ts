@@ -80,19 +80,21 @@ export const getAvailableReports = async (userId: string) => {
       },
     },
   });
-  const availableReports = report.map((report) => {
-    const distanceKm = calculateDistanceKm(
-      user.latitude!,
-      user.longitude!,
-      report.latitude,
-      report.longitude,
-    );
+  const availableReports = report
+    .map((report) => {
+      const distanceKm = calculateDistanceKm(
+        user.latitude!,
+        user.longitude!,
+        report.latitude,
+        report.longitude,
+      );
 
-    return {
-      ...report,
-      distanceKm,
-    };
-  }).filter((report) => report.distanceKm <= radiusKm);
+      return {
+        ...report,
+        distanceKm,
+      };
+    })
+    .filter((report) => report.distanceKm <= radiusKm);
 
   return availableReports;
 };
@@ -105,23 +107,37 @@ export const acceptReport = async (reportId: string, userId: string) => {
     throw new AppError("Report not found", 404);
   }
 
-  
-
   const updatedReport = await prisma.report.updateMany({
-    where: { id: reportId ,
-      status: "PENDING"
-    },
+    where: { id: reportId, status: "PENDING" },
     data: {
       status: "ACCEPTED",
       acceptedById: userId,
     },
   });
   if (updatedReport.count === 0) {
-  throw new AppError(
-    "Report is no longer available for acceptance",
-    409,
-  );
-}
+    throw new AppError("Report is no longer available for acceptance", 409);
+  }
 
+  return updatedReport;
+};
+export const completeReport = async (reportId: string, userId: string) => {
+  const report = await prisma.report.findUnique({
+    where: { id: reportId },
+  });
+  if (!report) {
+    throw new AppError("Report not found", 404);
+  }
+  if(report.status !== "ACCEPTED") {
+    throw new AppError("Report is not in an accepted state", 409);
+  }
+  if (report.acceptedById !== userId) {
+    throw new AppError("You are not authorized to complete this report", 403);
+  }
+  const updatedReport = await prisma.report.update({
+    where: { id: reportId  },
+    data: {
+      status: "COMPLETED",
+    },
+  });
   return updatedReport;
 };

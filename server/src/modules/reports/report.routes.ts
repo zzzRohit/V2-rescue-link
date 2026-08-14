@@ -28,5 +28,7 @@ router.get(
   reportController.getAvailableReports
 );
 router.patch("/:id/accept" , middleware, authorize(Role.RESCUER), reportController.acceptReport);
+
+router.patch("/:id/complete" , middleware, authorize(Role.RESCUER), reportController.completeReport);
 // router.get("/test-auth", middleware, testAuth);
 export default router;

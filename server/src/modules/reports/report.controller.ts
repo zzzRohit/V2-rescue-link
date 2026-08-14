@@ -68,3 +68,20 @@ export const acceptReport = async (req: Request, res: Response, next: NextFuncti
     next(error); // Pass the error to the error handling middleware
   }
 };
+export const completeReport = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const reportId = req.params.id;
+    const userId = req.user?.userId;
+    if (!reportId || Array.isArray(reportId)) {
+      throw new AppError("Report ID is missing or invalid", 400);
+    }
+    if (!userId) {
+      throw new AppError("User ID is missing in the request", 401);
+    }
+    const report = await reportService.completeReport(reportId, userId);
+    return res.status(200).json({ message: "Report completed successfully", data: report });
+  } catch (error) {
+    console.error("Controller Error:", error);
+    next(error); // Pass the error to the error handling middleware
+  }
+}
