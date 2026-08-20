@@ -1,9 +1,18 @@
 import { createServer } from "node:http";
+import {Server} from "socket.io";
 import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { prisma } from "./prisma/client.js";
 
 const server = createServer(app);
+const io = new Server(server);
+io.on("connection", (socket) => {
+  socket.on("hello", (data) => {
+    console.log("Received hello event:", data.message);
+  });
+  socket.emit("welcome", {"message": "Welcome to the server!"});
+  console.log(`Socket connected: ${socket.id}`);
+});
 server.listen(env.PORT, () => {
   console.log(`Server listening on port ${String(env.PORT)}`);
 });

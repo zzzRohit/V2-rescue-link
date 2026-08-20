@@ -64,6 +64,40 @@ async function main() {
     },
   });
 
+  const citizenTwo = await prisma.user.upsert({
+    where: { email: "citizen2@test.com" },
+    update: {
+      password: citizenPassword,
+      name: "Test Citizen Two",
+      phoneNumber: "9876543213",
+      role: Role.CITIZEN,
+    },
+    create: {
+      email: "citizen2@test.com",
+      password: citizenPassword,
+      name: "Test Citizen Two",
+      phoneNumber: "9876543213",
+      role: Role.CITIZEN,
+    },
+  });
+
+  const citizenThree = await prisma.user.upsert({
+    where: { email: "citizen3@test.com" },
+    update: {
+      password: citizenPassword,
+      name: "Test Citizen Three",
+      phoneNumber: "9876543214",
+      role: Role.CITIZEN,
+    },
+    create: {
+      email: "citizen3@test.com",
+      password: citizenPassword,
+      name: "Test Citizen Three",
+      phoneNumber: "9876543214",
+      role: Role.CITIZEN,
+    },
+  });
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@test.com" },
     update: {
@@ -81,10 +115,61 @@ async function main() {
     },
   });
 
+  const reports = await Promise.all([
+    prisma.report.upsert({
+      where: { trackingId: "RL-SEED-001" },
+      update: { reporterId: citizen.id },
+      create: {
+        trackingId: "RL-SEED-001",
+        title: "Injured street dog",
+        animalType: "DOG",
+        description: "A street dog appears injured near the public park.",
+        phoneNumber: citizen.phoneNumber,
+        latitude: 15.3647,
+        longitude: 75.124,
+        imageUrl: "https://placehold.co/800x600?text=Injured+Dog",
+        reporterId: citizen.id,
+      },
+    }),
+    prisma.report.upsert({
+      where: { trackingId: "RL-SEED-002" },
+      update: { reporterId: citizenTwo.id },
+      create: {
+        trackingId: "RL-SEED-002",
+        title: "Trapped kitten",
+        animalType: "CAT",
+        description: "A kitten is trapped near a residential drain.",
+        phoneNumber: citizenTwo.phoneNumber,
+        latitude: 15.369,
+        longitude: 75.13,
+        imageUrl: "https://placehold.co/800x600?text=Trapped+Kitten",
+        reporterId: citizenTwo.id,
+      },
+    }),
+    prisma.report.upsert({
+      where: { trackingId: "RL-SEED-003" },
+      update: { reporterId: citizenThree.id },
+      create: {
+        trackingId: "RL-SEED-003",
+        title: "Stranded bird",
+        animalType: "BIRD",
+        description: "An injured bird is unable to fly from a roadside area.",
+        phoneNumber: citizenThree.phoneNumber,
+        latitude: 15.358,
+        longitude: 75.118,
+        imageUrl: "https://placehold.co/800x600?text=Stranded+Bird",
+        reporterId: citizenThree.id,
+      },
+    }),
+  ]);
+
   console.log("Seed completed successfully:", {
     rescuer: rescuer.email,
     citizen: citizen.email,
+    citizenTwo: citizenTwo.email,
+    citizenThree: citizenThree.email,
     admin: admin.email,
+    reports: reports.length,
   });
 }
 
