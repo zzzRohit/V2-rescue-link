@@ -3,6 +3,7 @@ import { prisma } from "../../prisma/client.js";
 import { AppError } from "../../utils/Apperror.js";
 import { generateTrackingId } from "../../utils/trackingId.js";
 import { calculateDistanceKm } from "../../utils/distance.js";
+import { getIO } from "../../Socket.js";
 type CreateReportInput = {
   title: string;
   animalType: AnimalType;
@@ -32,6 +33,10 @@ export const createReport = async (
       imageUrl: reportData.imageUrl,
       reporterId: reporterId ?? null,
     },
+  });
+  const io = getIO();
+  io.to("user:e01a0d2a-9864-4dec-94c4-1bde2a55db46").emit("new-report", {
+    message: "New animal emergency reported!",
   });
 
   return {
@@ -127,14 +132,14 @@ export const completeReport = async (reportId: string, userId: string) => {
   if (!report) {
     throw new AppError("Report not found", 404);
   }
-  if(report.status !== "ACCEPTED") {
+  if (report.status !== "ACCEPTED") {
     throw new AppError("Report is not in an accepted state", 409);
   }
   if (report.acceptedById !== userId) {
     throw new AppError("You are not authorized to complete this report", 403);
   }
   const updatedReport = await prisma.report.update({
-    where: { id: reportId  },
+    where: { id: reportId },
     data: {
       status: "COMPLETED",
     },
