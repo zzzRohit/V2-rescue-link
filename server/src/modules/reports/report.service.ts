@@ -35,9 +35,45 @@ export const createReport = async (
     },
   });
   const io = getIO();
-  io.to("user:e01a0d2a-9864-4dec-94c4-1bde2a55db46").emit("new-report", {
-    message: "New animal emergency reported!",
+
+  const rescuers = await prisma.user.findMany({
+    where: {
+      role: "RESCUER",
+      latitude: {
+        not: null,
+      },
+      longitude: {
+        not: null,
+      },
+    },
   });
+  for (const rescuer of rescuers) {
+    const distanceKm = calculateDistanceKm(
+      rescuer.latitude!,
+      rescuer.longitude!,
+      report.latitude,
+      report.longitude,
+    );
+
+    const radiusKm = rescuer.serviceRadiusKm ?? 30;
+
+    if (distanceKm <= radiusKm) {
+      io.to(`user:${rescuer.id}`).emit("new-report", {
+        message: "New animal emergency reported!",
+        report: {
+          id: report.id,
+          trackingId: report.trackingId,
+          title: report.title,
+          animalType: report.animalType,
+          description: report.description,
+          latitude: report.latitude,
+          longitude: report.longitude,
+          imageUrl: report.imageUrl,
+        },
+        distanceKm,
+      });
+    }
+  }
 
   return {
     trackingId: report.trackingId,
