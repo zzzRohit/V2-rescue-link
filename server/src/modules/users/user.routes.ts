@@ -6,5 +6,5 @@ import { Role } from "../../../generated/prisma/client.js";
 
 const router = Router();
 router.patch("/location", middleware,authorize(Role.RESCUER), userController.updateLocation);
-
+router.patch("/availability", middleware, authorize(Role.RESCUER), userController.updateAvailability);
 export default router;

@@ -18,3 +18,18 @@ export const updateLocation = async (userId: string, longitude: number, latitude
 
   return updatedUser;
 };
+export const updateAvailability = async (userId: string, isAvailable: boolean) => {
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      isAvailable,
+    },
+    select: {
+      id: true,
+      role: true,
+      isAvailable: true,
+    },
+  });
+
+  return updatedUser; 
+}

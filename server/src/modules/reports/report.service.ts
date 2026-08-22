@@ -39,6 +39,7 @@ export const createReport = async (
   const rescuers = await prisma.user.findMany({
     where: {
       role: "RESCUER",
+      isAvailable: true,
       latitude: {
         not: null,
       },

@@ -20,6 +20,7 @@ model User {
   latitude          Float?
   serviceRadiusKm   Float?
   locationUpdatedAt DateTime?
+  isAvailable       Boolean   @default(false)
   acceptedReports   Report[]  @relation("AcceptedReports")
   reports           Report[]
 }
